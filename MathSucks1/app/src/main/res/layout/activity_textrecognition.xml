@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MedicineL">
+
+    <com.baoyz.swipemenulistview.SwipeMenuListView
+        android:id="@+id/listView"
+        android:layout_width="380dp"
+        android:layout_height="530dp"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints"
+        ></com.baoyz.swipemenulistview.SwipeMenuListView>
+
+    <Button
+        android:id="@+id/Home"
+        android:layout_width="130dp"
+        android:layout_height="51dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="170dp"
+        android:layout_marginTop="8dp"
+        android:text="Home"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/listView"
+        app:layout_constraintRight_toRightOf="@id/Camera"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/Camera"
+        android:layout_width="130dp"
+        android:layout_height="51dp"
+        android:layout_marginLeft="170dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="8dp"
+        android:text="Scan"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/listView"
+        tools:ignore="MissingConstraints" />>
+</android.support.constraint.ConstraintLayout>

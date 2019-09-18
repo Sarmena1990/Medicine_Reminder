@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1069462463335",
+    "firebase_url": "https://mathsucks1-30d3f.firebaseio.com",
+    "project_id": "mathsucks1-30d3f",
+    "storage_bucket": "mathsucks1-30d3f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069462463335:android:8c9f4977174d6d19",
+        "android_client_info": {
+          "package_name": "com.example.mathsucks1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1069462463335-f0g70i0r882n66r8f662e65fvq1sf3ne.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mathsucks1",
+            "certificate_hash": "b4050543f3bec39673ac411a9acfd18b733b1759"
+          }
+        },
+        {
+          "client_id": "1069462463335-ev6ft8pje9hr2umid1258lrdm5dntjlu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeX6QGnAB01gNrEpiqJGMrhvzYd_217P0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1069462463335-ev6ft8pje9hr2umid1258lrdm5dntjlu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
