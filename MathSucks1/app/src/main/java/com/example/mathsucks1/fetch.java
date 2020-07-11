@@ -12,8 +12,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -62,13 +60,15 @@ public class fetch extends AsyncTask<Void,Void,Void> {
 
         try {
 
-            URL url = new URL("https://api.myjson.com/bins/1dakyz");
+            URL url = new URL("https://api.fda.gov/drug/label.json?count=openfda.brand_name.exact&limit=1000");
 
             HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
 
             InputStream inputStream = httpsURLConnection.getInputStream();
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+            System.out.println("data1"+bufferedReader  );
 
             String line = "";
 
@@ -77,8 +77,10 @@ public class fetch extends AsyncTask<Void,Void,Void> {
                 line = bufferedReader.readLine();
                 data = data+line;
             }
+            JSONObject jsonObject = new JSONObject(data);
 
-            JSONArray JA = new JSONArray(data);
+            JSONArray JA = jsonObject.getJSONArray("results");
+
 
             for(int i=0;i<JA.length();i++){
 

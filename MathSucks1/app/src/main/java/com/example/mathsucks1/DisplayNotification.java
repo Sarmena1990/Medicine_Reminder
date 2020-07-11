@@ -1,26 +1,15 @@
 package com.example.mathsucks1;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.AudioAttributes;
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.widget.Toast;
-
-import java.util.Date;
 
 public class DisplayNotification extends BroadcastReceiver {
 
@@ -36,12 +25,13 @@ public class DisplayNotification extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        state = intent.getExtras().getString("Alarm Id");
-        System.out.println("State: "+state);
+//        state = intent.getExtras().getString("Alarm Id");
+//        System.out.println("State: "+state);
+
+        Home home = new Home();
 
 
-
-         media_song = MediaPlayer.create(context, R.raw.ringtone);
+         media_song = MediaPlayer.create(context, R.raw.guitar);
 //        if(intent.getExtras() !=null) {
 
 
@@ -49,7 +39,7 @@ public class DisplayNotification extends BroadcastReceiver {
         String drugN = intent.getExtras().getString("name");
         String drugI = intent.getExtras().getString("info");
         int reqN = intent.getExtras().getInt("requestN");
-        int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
+//        int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
 
 
         Intent cancelA = new Intent(context, Action1.class);
@@ -79,7 +69,8 @@ public class DisplayNotification extends BroadcastReceiver {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
 //        if(intent.getExtras().getString())
-        media_song.start();
+//        media_song.start();
+        MusicControl.getInstance(context).playMusic();
         // notificationId is a unique int for each notification that you must define
         notificationManager.notify(reqN, builder.build());
         media_song.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -101,5 +92,6 @@ public class DisplayNotification extends BroadcastReceiver {
     private void stop() {
         media_song.stop();
     }
+
 
 }

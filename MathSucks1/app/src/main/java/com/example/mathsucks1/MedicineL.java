@@ -9,14 +9,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,9 +28,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MedicineL extends AppCompatActivity {
 
@@ -58,18 +53,18 @@ public class MedicineL extends AppCompatActivity {
     String title = "MathSucks1";
 
     String content ;
+    String username;
 
     Button camera ;
 
     Button home;
 
     Medicin medicin = new Medicin();
+    ArrayList<Users> userList = new ArrayList<>();
 
-//    private int notificationId = 123;
+    Map<String, ArrayList<Medicin>>map ;
 
-//    Random r = new Random();
-//
-//    int m =r.nextInt();
+    ArrayList<String> names ;
     int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
 
     AlarmManager alarmManager;
@@ -94,8 +89,6 @@ public class MedicineL extends AppCompatActivity {
 //
 //        String drugI = getIntent().getExtras().getString("info");
 
-
-
         camera=(Button)findViewById(R.id.Camera) ;
 
         home=(Button)findViewById(R.id.Home) ;
@@ -104,10 +97,27 @@ public class MedicineL extends AppCompatActivity {
 
         listN = new ArrayList<>();
 
+        listMO = new ArrayList<>();
+
+        map = new HashMap<>();
 
 
-          loadData();
-//        loadDataI();
+
+//          loadData();
+          loadDataUser();
+          loadDataM();
+          loadDataS();
+
+          username = userList.get(0).getUserName();
+
+        if(!map.containsKey(username)){
+            map.put(username,listMO);
+            saveDataM();
+        }
+
+        System.out.println("username medicineL: "+ username);
+        listMO = map.get(username);
+
 
 
 //      To connect the listeview with sepecified arraylist
@@ -117,16 +127,16 @@ public class MedicineL extends AppCompatActivity {
 //        listView.setAdapter(adapter);
 
 
-
         createNC();
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         intent = new Intent(MedicineL.this, DisplayNotification.class);
 //        intent1 = new Intent(MedicineL.this, Action1.class);
-        if(getIntent().getExtras() == null){
+        if(getIntent().getExtras()== null){
         intent.putExtra("name", medicin.getName());
         intent.putExtra("info", medicin.getInfo());
         intent.putExtra("requestN", medicin.getRequestN());
+
         }
 
         pendingIntent = PendingIntent.getBroadcast(MedicineL.this, m, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -163,18 +173,19 @@ public class MedicineL extends AppCompatActivity {
 
 
 
+                medicin.setTime(SystemClock.elapsedRealtime()+ (60*250/medicin.getCount()));
 
-                alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + (60*250/medicin.getCount()), 60*250/medicin.getCount(), pendingIntent);
+                alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,medicin.getTime(), 60*250/medicin.getCount(), pendingIntent);
 
 
 
                 listMO.add(medicin);
-                saveData();
+//                saveData();
+                saveDataA();
+                saveDataM();
             }
-
-//            System.out.println("the size of list is: " + listMO.size());
-
         }
+
 
 
         for(int i=0;i<listMO.size();i++) {
@@ -258,7 +269,7 @@ public class MedicineL extends AppCompatActivity {
 
         listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+            public boolean onMenuItemClick(final int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
                         AlertDialog.Builder builder = new AlertDialog.Builder(MedicineL.this);
@@ -276,14 +287,34 @@ public class MedicineL extends AppCompatActivity {
 
                         break;
                     case 1:
-                        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(MedicineL.this,listMO.get(position).getRequestN(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        alarmManager.cancel(pendingIntent1);
-                        listMO.remove(position);
-                        listN.remove(position);
-                        saveData();
-//                       saveDataI();
-                        adapter.notifyDataSetChanged();
-                        listView.setAdapter(adapter);
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(MedicineL.this);
+
+                        builder1.setMessage("Are you sure want to delete "+ listMO.get(position).getName()+" from the list")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(MedicineL.this,listMO.get(position).getRequestN(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                        alarmManager.cancel(pendingIntent1);
+                                        listMO.remove(position);
+                                        listN.remove(position);
+                                        saveDataM();
+//
+                                        adapter.notifyDataSetChanged();
+                                        listView.setAdapter(adapter);
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        AlertDialog alertDialog1 = builder1.create();
+                        alertDialog1.show();
+
 
                         break;
 
@@ -292,6 +323,10 @@ public class MedicineL extends AppCompatActivity {
                 return false;
             }
         });
+
+    }
+
+    private void deleteItem(){
 
     }
 
@@ -305,32 +340,112 @@ public class MedicineL extends AppCompatActivity {
         return result;
     }
 
+//    private void saveData(){
+//        SharedPreferences sharedPreferences = getSharedPreferences("shared prefrences", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        Gson gson =new Gson();
+//        String json = gson.toJson(listMO);
+//        editor.putString("task listN", json);
+//        editor.apply();
+//    }
+//    private void loadData(){
+//        SharedPreferences sharedPreferences = getSharedPreferences("shared prefrences", MODE_PRIVATE);
+//        Gson gson =new Gson();
+//        String json = sharedPreferences.getString("task listN",null);
+//        Type type = new TypeToken<ArrayList<Medicin>>() {}.getType();
+//        listMO = gson.fromJson(json, type);
+//
+//        if(listMO == null){
+//            listMO = new ArrayList<>();
+//        }
+//
+//
+//    }
 
-    private void saveData(){
-        SharedPreferences sharedPreferences = getSharedPreferences("shared prefrences", MODE_PRIVATE);
+    private void loadDataS(){
+    SharedPreferences sharedPreferences = getSharedPreferences("name", MODE_PRIVATE);
+    Gson gson =new Gson();
+    String json = sharedPreferences.getString("task1",null);
+    Type type = new TypeToken<ArrayList<String>>() {}.getType();
+    names = gson.fromJson(json, type);
+
+    if(names == null){
+        names = new ArrayList<>();
+
+
+    }
+
+}
+
+    private void saveDataA(){
+        SharedPreferences sharedPreferences = getSharedPreferences("Alarm Manager", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson =new Gson();
-        String json = gson.toJson(listMO);
-        editor.putString("task listN", json);
+        String json = gson.toJson(alarmManager);
+        editor.putString("task A", json);
         editor.apply();
     }
-    private void loadData(){
-        SharedPreferences sharedPreferences = getSharedPreferences("shared prefrences", MODE_PRIVATE);
-        Gson gson =new Gson();
-        String json = sharedPreferences.getString("task listN",null);
-        Type type = new TypeToken<ArrayList<Medicin>>() {}.getType();
-        listMO = gson.fromJson(json, type);
 
-        if(listMO == null){
-            listMO = new ArrayList<>();
+    private void loadDataA(){
+        SharedPreferences sharedPreferences = getSharedPreferences("Alarm manager", MODE_PRIVATE);
+        Gson gson =new Gson();
+        String json = sharedPreferences.getString("task A",null);
+        Type type = new TypeToken<AlarmManager>() {}.getType();
+        alarmManager = gson.fromJson(json, type);
+
+
+
+    }
+
+    private void saveDataM(){
+        SharedPreferences sharedPreferences = getSharedPreferences("Map", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson =new Gson();
+        String json = gson.toJson(map);
+        editor.putString("task A", json);
+        editor.apply();
+    }
+
+    private void loadDataM(){
+        SharedPreferences sharedPreferences = getSharedPreferences("Map", MODE_PRIVATE);
+        Gson gson =new Gson();
+        String json = sharedPreferences.getString("task A",null);
+        Type type = new TypeToken<Map<String, ArrayList<Medicin> >>() {}.getType();
+        map = gson.fromJson(json, type);
+        if(map == null){
+            map = new HashMap<>();
+        }
+
+
+
+    }
+
+
+    private void loadDataUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences("UserName", MODE_PRIVATE);
+        Gson gson =new Gson();
+        String json = sharedPreferences.getString("task B",null);
+        Type type = new TypeToken<ArrayList<Users>>() {}.getType();
+        userList = gson.fromJson(json, type);
+        if(userList == null){
+            userList = new ArrayList<>();
         }
 
 
     }
 
+    private void saveDataUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences("UserName", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson =new Gson();
+        String json = gson.toJson(userList);
+        editor.putString("task B", json);
+        editor.apply();
+    }
 
 
-   public void createNC() {
+
+    public void createNC() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     NotificationChannel channel = new NotificationChannel(CHANNEL_ID,CHANNEL_NAME,NotificationManager.IMPORTANCE_DEFAULT);
                     channel.setDescription(CHANNEL_DESC);
@@ -340,48 +455,5 @@ public class MedicineL extends AppCompatActivity {
 
     }
 
-    public void displayNotification(){
-        // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(MedicineL.this, Home.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(MedicineL.this, 0, intent, 0);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(MedicineL.this,CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_medicine)
-                .setContentTitle("My notification")
-                .setContentText("Hello World!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(MedicineL.this);
-
-        // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(1, builder.build());
-    }
-
-
-//    private void saveDataI(){
-//        SharedPreferences sharedPreferences = getSharedPreferences("shared prefrences1", MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        Gson gson =new Gson();
-//        String json = gson.toJson(listI);
-//        editor.putString("task listI", json);
-//        editor.apply();
-//    }
-//    private void loadDataI(){
-//        SharedPreferences sharedPreferences = getSharedPreferences("shared prefrences1", MODE_PRIVATE);
-//        Gson gson =new Gson();
-//        String json = sharedPreferences.getString("task listI",null);
-//        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-//        listI = gson.fromJson(json, type);
-//
-//        if(listI == null){
-//            listI = new ArrayList<>();
-//        }
-//
-//
-//    }
 }
 

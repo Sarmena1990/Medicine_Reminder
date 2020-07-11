@@ -62,13 +62,15 @@ public class fetchData extends AsyncTask<Void,Void,Void> {
 
         try {
 
-            URL url = new URL("https://api.myjson.com/bins/1dakyz");
+            URL url = new URL("https://api.fda.gov/drug/label.json?count=openfda.brand_name.exact&limit=1000");
 
             HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
 
             InputStream inputStream = httpsURLConnection.getInputStream();
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+            System.out.println("data1"+bufferedReader);
 
             String line = "";
 
